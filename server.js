@@ -2,17 +2,23 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const db = require('./db.js')
 
 const app = express();
 const PORT = 4000;
 
-let users = []; // Almacenamiento temporal de usuarios registrados
+let users = []; 
 
 app.use(bodyParser.json());
 app.use(cors());
 
 // Servir los archivos estáticos generados por el frontend
 app.use(express.static(path.join(__dirname, '..', '..', '..', 'React', 'gestionActividadesFront', 'front', 'build')));
+
+// Servir el archivo index.html para todas las rutas no definidas
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', '..', '..', 'React', 'gestionActividadesFront', 'front', 'build', 'index.html'));
+});
 
 app.post('/api/register', (req, res) => {
   const { username, password } = req.body;
@@ -35,11 +41,6 @@ app.post('/api/login', (req, res) => {
     return res.status(401).json({ message: 'Credenciales inválidas' });
   }
   res.status(200).json({ message: 'Inicio de sesión exitoso' });
-});
-
-// Servir el archivo index.html para todas las rutas no definidas
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'React', 'gestionActividadesFront', 'front', 'build', 'index.html'));
 });
 
 app.listen(PORT, () => {
